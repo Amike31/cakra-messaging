@@ -14,6 +14,7 @@ import { auth } from "./utils/firebaseConfig";
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
 import Room from "./pages/Room";
+import Chat from "./pages/Chat";
 
 import LogoutIcon from "@mui/icons-material/Logout";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
@@ -38,7 +39,7 @@ const App = () => {
         <AppBar position="static">
           <Toolbar>
             <Typography variant="h6" sx={{ flexGrow: 1 }}>
-              Chat Room
+              Cakra Mssenger
             </Typography>
             <Box display={auth.currentUser ? "flex" : "none"} gap={3}>
               <Button
@@ -64,6 +65,7 @@ const App = () => {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/register" element={<Register />} />
           <Route path="/room" element={<Room />} />
+          <Route path="/chat/:roomId" element={<Chat />} />
         </Routes>
       </Container>
     </>

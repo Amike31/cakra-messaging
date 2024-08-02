@@ -52,7 +52,7 @@ const Room = () => {
   });
 
   const handleRoomClick = (roomId, friendId) => {
-    console.log("Room ID: ", roomId); // handle this next
+    navigate(`/chat/${roomId}`, { state: { id: friendId } });
   };
 
   const handleOpenDialog = () => {
