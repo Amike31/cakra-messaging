@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { firestore, auth } from "../utils/firebaseConfig";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import useSpeechRecognition from "../utils/speechRecognitionHooks";
 import {
   collection,
   onSnapshot,
@@ -18,20 +19,43 @@ import {
   Container,
   Box,
   TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 
-import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
+import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import MicIcon from "@mui/icons-material/Mic";
+import StopIcon from "@mui/icons-material/Stop";
 
 const Chat = () => {
   const { roomId } = useParams();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [showPicker, setShowPicker] = useState(false);
+  const {
+    isRecording,
+    transcript,
+    error,
+    startRecording,
+    stopRecording,
+    hasRecognition,
+    showConfirmation,
+    setShowConfirmation,
+  } = useSpeechRecognition();
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    if (transcript.trim() === "") {
+      return;
+    }
+    setNewMessage(transcript);
+  }, [transcript]);
 
   useEffect(() => {
     if (!roomId) {
@@ -81,6 +105,32 @@ const Chat = () => {
   const addEmoji = (emoji) => {
     setNewMessage(newMessage + emoji.native);
   };
+
+  const handleRecordToggle = () => {
+    if (isRecording) {
+      stopRecording();
+      setShowConfirmation(true);
+    } else {
+      startRecording();
+    }
+  };
+
+  const handleConfirmation = (e) => {
+    setShowConfirmation(false);
+    handleSendMessage(e);
+  };
+
+  const handleDialogClose = () => {
+    setShowConfirmation(false);
+  };
+
+  // check hasRecognition to see if the browser supports speech recognition
+  useEffect(() => {
+    console.log("Speech recognition supported: ", hasRecognition);
+    if (!hasRecognition) {
+      console.error("Speech recognition is not supported in this browser.");
+    }
+  }, [hasRecognition]);
 
   return (
     <Container maxWidth="sm">
@@ -158,6 +208,13 @@ const Chat = () => {
           <Button type="submit" variant="contained" color="primary" fullWidth>
             Send
           </Button>
+          <IconButton
+            color="primary"
+            variant="contained"
+            onClick={handleRecordToggle}
+          >
+            {isRecording ? <StopIcon /> : <MicIcon />}
+          </IconButton>
         </Box>
 
         {showPicker && (
@@ -165,6 +222,33 @@ const Chat = () => {
             <Picker data={data} onEmojiSelect={addEmoji} />
           </Box>
         )}
+
+        <Dialog open={showConfirmation} onClose={handleDialogClose}>
+          <DialogTitle>Confirm Transcribed Message</DialogTitle>
+          <DialogContent>
+            <TextField
+              multiline
+              rows={4}
+              variant="outlined"
+              fullWidth
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+            />
+            {error && (
+              <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                {error}
+              </Typography>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDialogClose} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmation} color="primary">
+              Send
+            </Button>
+          </DialogActions>
+        </Dialog>
       </form>
     </Container>
   );

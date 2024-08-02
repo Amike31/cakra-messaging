@@ -38,7 +38,7 @@ const SignIn = () => {
 
   return (
     <Container maxWidth="sm">
-      <Box sx={{ mt: 8 }}>
+      <Box sx={{ mt: 8 }} display="flex" flexDirection="column">
         <Typography variant="h4" gutterBottom>
           Sign In
         </Typography>
@@ -87,12 +87,11 @@ const SignIn = () => {
         <Button
           variant="contained"
           color="secondary"
-          fullWidth
           startIcon={<GoogleIcon />}
           onClick={handleGoogleSignIn}
-          sx={{ mt: 2 }}
+          sx={{ mt: 2, width: "50%",alignSelf: "center" }}
         >
-          Sign In with Google
+          Google
         </Button>
         <Typography variant="body2" sx={{ mt: 2 }}>
           Don't have an account?{" "}
