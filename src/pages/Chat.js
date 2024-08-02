@@ -124,7 +124,6 @@ const Chat = () => {
     setShowConfirmation(false);
   };
 
-  // check hasRecognition to see if the browser supports speech recognition
   useEffect(() => {
     console.log("Speech recognition supported: ", hasRecognition);
     if (!hasRecognition) {
